@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>sequencer.lua</title>
+<link rel="stylesheet" type="text/css" href="highlight.css">
+</head>
+<body class="hl">
+<pre class="hl"><a name="sequencer.lua_1"></a><span class="hl lin">001 </span><span class="hl slc">-- use lua to wait for our sequencer to terminate</span>
+<a name="sequencer.lua_2"></a><span class="hl lin">002 </span>
+<a name="sequencer.lua_3"></a><span class="hl lin">003 </span><span class="hl kwb">print</span><span class="hl opt">(</span><span class="hl str">&quot;Lua Sequencer example&quot;</span><span class="hl opt">)</span>
+<a name="sequencer.lua_4"></a><span class="hl lin">004 </span>
+<a name="sequencer.lua_5"></a><span class="hl lin">005 </span><span class="hl slc">-- From C++:</span>
+<a name="sequencer.lua_6"></a><span class="hl lin">006 </span><span class="hl slc">--        sequencer.Add( SeqEffectPtr( new SeqTimedEffect( 200, MessagePtr( new StringMessage(&quot;TwoHundret&quot;)), 5 )));</span>
+<a name="sequencer.lua_7"></a><span class="hl lin">007 </span><span class="hl slc">--        // one shot &#64; 500ms</span>
+<a name="sequencer.lua_8"></a><span class="hl lin">008 </span><span class="hl slc">--        MessagePtr middle( new StringMessage(&quot;Middle!&quot;));</span>
+<a name="sequencer.lua_9"></a><span class="hl lin">009 </span><span class="hl slc">--        sequencer.Add( SeqEffectPtr( new SeqTimedEffect( 500, middle )));</span>
+<a name="sequencer.lua_10"></a><span class="hl lin">010 </span><span class="hl slc">--        // exit after 1 second, we could also use a counter in &quot;OneHundret&quot; and send terminate from there. Add 10ms to avoid overlap with 1</span>
+<a name="sequencer.lua_11"></a><span class="hl lin">011 </span><span class="hl slc">--        sequencer.Add( SeqEffectPtr( new SeqTimedEffect( 1010, MessagePtr( new Sequencer::StateMessage( Sequencer::TERMINATE)) )));</span>
+<a name="sequencer.lua_12"></a><span class="hl lin">012 </span><span class="hl slc">--        // this one waits for an event, send from another effect (middle)</span>
+<a name="sequencer.lua_13"></a><span class="hl lin">013 </span><span class="hl slc">--        sequencer.Add( SeqEffectPtr( new SeqEventEffect( middle,  MessagePtr( new StringMessage(&quot;Hey, we got a message! Creating a new one!&quot;)) )));</span>
+<a name="sequencer.lua_14"></a><span class="hl lin">014 </span><span class="hl slc">--        sequencer.Start();</span>
+<a name="sequencer.lua_15"></a><span class="hl lin">015 </span>
+<a name="sequencer.lua_16"></a><span class="hl lin">016 </span>
+<a name="sequencer.lua_17"></a><span class="hl lin">017 </span><span class="hl slc">-- and get a ref to the sequencer (we share this with the main code)</span>
+<a name="sequencer.lua_18"></a><span class="hl lin">018 </span>seq <span class="hl opt">=</span> pei<span class="hl opt">.</span><span class="hl kwd">Sequencer</span><span class="hl opt">()</span>
+<a name="sequencer.lua_19"></a><span class="hl lin">019 </span>
+<a name="sequencer.lua_20"></a><span class="hl lin">020 </span><span class="hl slc">-- register a new listerner to the sequencer</span>
+<a name="sequencer.lua_21"></a><span class="hl lin">021 </span><span class="hl slc">-- create a local eventlistener</span>
+<a name="sequencer.lua_22"></a><span class="hl lin">022 </span>listener <span class="hl opt">=</span> pei<span class="hl opt">.</span><span class="hl kwd">EventListener</span><span class="hl opt">(</span>pei<span class="hl opt">.</span>Sequencer<span class="hl opt">.</span><span class="hl kwd">StateMessage</span><span class="hl opt">(</span>pei<span class="hl opt">.</span>Sequencer<span class="hl opt">.</span>STOPPED<span class="hl opt">))</span>
+<a name="sequencer.lua_23"></a><span class="hl lin">023 </span>seq<span class="hl opt">:</span><span class="hl kwd">RegisterListener</span><span class="hl opt">(</span> listener <span class="hl opt">)</span>
+<a name="sequencer.lua_24"></a><span class="hl lin">024 </span><span class="hl slc">-- message, efx and than add it to the sequencer</span>
+<a name="sequencer.lua_25"></a><span class="hl lin">025 </span>middle <span class="hl opt">=</span> pei<span class="hl opt">.</span><span class="hl kwd">StringMessage</span><span class="hl opt">(</span><span class="hl str">&quot;Middle!&quot;</span><span class="hl opt">)</span>
+<a name="sequencer.lua_26"></a><span class="hl lin">026 </span>efx <span class="hl opt">=</span> pei<span class="hl opt">.</span><span class="hl kwd">SeqTimedEffect</span><span class="hl opt">(</span> <span class="hl num">500.0</span><span class="hl opt">,</span> middle <span class="hl opt">)</span>
+<a name="sequencer.lua_27"></a><span class="hl lin">027 </span>seq<span class="hl opt">:</span><span class="hl kwd">Add</span><span class="hl opt">(</span> efx <span class="hl opt">)</span>
+<a name="sequencer.lua_28"></a><span class="hl lin">028 </span><span class="hl slc">-- or all in one line</span>
+<a name="sequencer.lua_29"></a><span class="hl lin">029 </span>seq<span class="hl opt">:</span><span class="hl kwd">Add</span><span class="hl opt">(</span> pei<span class="hl opt">.</span><span class="hl kwd">SeqTimedEffect</span><span class="hl opt">(</span> <span class="hl num">200</span><span class="hl opt">,</span> pei<span class="hl opt">.</span><span class="hl kwd">StringMessage</span><span class="hl opt">(</span><span class="hl str">&quot;TwoHundret&quot;</span><span class="hl opt">),</span> <span class="hl num">5</span> <span class="hl opt">))</span>
+<a name="sequencer.lua_30"></a><span class="hl lin">030 </span>seq<span class="hl opt">:</span><span class="hl kwd">Add</span><span class="hl opt">(</span> pei<span class="hl opt">.</span><span class="hl kwd">SeqEventEffect</span><span class="hl opt">(</span> middle<span class="hl opt">,</span> pei<span class="hl opt">.</span><span class="hl kwd">StringMessage</span><span class="hl opt">(</span><span class="hl str">&quot;Hey, we got a message! Bounce this back at ya'!&quot;</span><span class="hl opt">)))</span>
+<a name="sequencer.lua_31"></a><span class="hl lin">031 </span><span class="hl slc">-- don't forget the terminator, else we will wait forever</span>
+<a name="sequencer.lua_32"></a><span class="hl lin">032 </span>seq<span class="hl opt">:</span><span class="hl kwd">Add</span><span class="hl opt">(</span> pei<span class="hl opt">.</span><span class="hl kwd">SeqTimedEffect</span><span class="hl opt">(</span> <span class="hl num">1000</span><span class="hl opt">,</span> pei<span class="hl opt">.</span>Sequencer<span class="hl opt">.</span><span class="hl kwd">StateMessage</span><span class="hl opt">(</span>pei<span class="hl opt">.</span>Sequencer<span class="hl opt">.</span>TERMINATE <span class="hl opt">)))</span>
+<a name="sequencer.lua_33"></a><span class="hl lin">033 </span><span class="hl slc">-- start the sequencer</span>
+<a name="sequencer.lua_34"></a><span class="hl lin">034 </span>seq<span class="hl opt">:</span><span class="hl kwd">Start</span><span class="hl opt">()</span>
+<a name="sequencer.lua_35"></a><span class="hl lin">035 </span>
+<a name="sequencer.lua_36"></a><span class="hl lin">036 </span>
+<a name="sequencer.lua_37"></a><span class="hl lin">037 </span><span class="hl slc">-- and wait 'til it stops. The app will wait until this lua program terminates</span>
+<a name="sequencer.lua_38"></a><span class="hl lin">038 </span><span class="hl kwb">print</span><span class="hl opt">(</span><span class="hl str">&quot;Wait for Sequencer to terminate&quot;</span><span class="hl opt">)</span>
+<a name="sequencer.lua_39"></a><span class="hl lin">039 </span>listener<span class="hl opt">:</span><span class="hl kwd">WaitEvent</span><span class="hl opt">()</span>
+<a name="sequencer.lua_40"></a><span class="hl lin">040 </span><span class="hl kwb">print</span><span class="hl opt">(</span><span class="hl str">&quot;All done!&quot;</span><span class="hl opt">)</span>
+</pre>
+</body>
+</html>
+<!--HTML generated by highlight 3.9, http://www.andre-simon.de/-->

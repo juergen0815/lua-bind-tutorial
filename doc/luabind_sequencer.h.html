@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>luabind_sequencer.h</title>
+<link rel="stylesheet" type="text/css" href="highlight.css">
+</head>
+<body class="hl">
+<pre class="hl"><a name="luabind_sequencer.h_1"></a><span class="hl lin">001 </span><span class="hl com">/*</span>
+<a name="luabind_sequencer.h_2"></a><span class="hl lin">002 </span><span class="hl com"> * luabind_test.h</span>
+<a name="luabind_sequencer.h_3"></a><span class="hl lin">003 </span><span class="hl com"> *</span>
+<a name="luabind_sequencer.h_4"></a><span class="hl lin">004 </span><span class="hl com"> *  Created on: Apr 25, 2012</span>
+<a name="luabind_sequencer.h_5"></a><span class="hl lin">005 </span><span class="hl com"> *      Author: jschober</span>
+<a name="luabind_sequencer.h_6"></a><span class="hl lin">006 </span><span class="hl com"> */</span>
+<a name="luabind_sequencer.h_7"></a><span class="hl lin">007 </span>
+<a name="luabind_sequencer.h_8"></a><span class="hl lin">008 </span><span class="hl ppc">#ifndef __LUABIND_SEQUENCER_H__</span>
+<a name="luabind_sequencer.h_9"></a><span class="hl lin">009 </span><span class="hl ppc">#define __LUABIND_SEQUENCER_H__</span>
+<a name="luabind_sequencer.h_10"></a><span class="hl lin">010 </span>
+<a name="luabind_sequencer.h_11"></a><span class="hl lin">011 </span><span class="hl ppc">#ifdef _HAS_LUA_BIND_</span>
+<a name="luabind_sequencer.h_12"></a><span class="hl lin">012 </span>
+<a name="luabind_sequencer.h_13"></a><span class="hl lin">013 </span><span class="hl ppc">#include</span> <span class="hl pps">&quot;luabind_macros.h&quot;</span><span class="hl ppc"></span>
+<a name="luabind_sequencer.h_14"></a><span class="hl lin">014 </span>
+<a name="luabind_sequencer.h_15"></a><span class="hl lin">015 </span><span class="hl ppc">#include &lt;string&gt;</span>
+<a name="luabind_sequencer.h_16"></a><span class="hl lin">016 </span>
+<a name="luabind_sequencer.h_17"></a><span class="hl lin">017 </span><span class="hl ppc">#include &lt;message_queue.h&gt;</span>
+<a name="luabind_sequencer.h_18"></a><span class="hl lin">018 </span><span class="hl ppc">#include &lt;listener.h&gt;</span>
+<a name="luabind_sequencer.h_19"></a><span class="hl lin">019 </span><span class="hl ppc">#include &lt;sequencer.h&gt;</span>
+<a name="luabind_sequencer.h_20"></a><span class="hl lin">020 </span><span class="hl ppc">#include &lt;sequence_event_effect.h&gt;</span>
+<a name="luabind_sequencer.h_21"></a><span class="hl lin">021 </span><span class="hl ppc">#include &lt;sequence_timed_effect.h&gt;</span>
+<a name="luabind_sequencer.h_22"></a><span class="hl lin">022 </span>
+<a name="luabind_sequencer.h_23"></a><span class="hl lin">023 </span><span class="hl ppc">#include &lt;boost/shared_ptr.hpp&gt;</span>
+<a name="luabind_sequencer.h_24"></a><span class="hl lin">024 </span>
+<a name="luabind_sequencer.h_25"></a><span class="hl lin">025 </span><span class="hl slc">// global sequencer</span>
+<a name="luabind_sequencer.h_26"></a><span class="hl lin">026 </span><span class="hl kwc">extern</span> Sequencer sequencer<span class="hl opt">;</span>
+<a name="luabind_sequencer.h_27"></a><span class="hl lin">027 </span>
+<a name="luabind_sequencer.h_28"></a><span class="hl lin">028 </span><span class="hl kwa">namespace</span> luasequencer
+<a name="luabind_sequencer.h_29"></a><span class="hl lin">029 </span><span class="hl opt">{</span>
+<a name="luabind_sequencer.h_30"></a><span class="hl lin">030 </span>    <span class="hl kwb">void</span> <span class="hl kwd">CreateMessageExports</span><span class="hl opt">(</span> lua_State<span class="hl opt">*</span> lua<span class="hl opt">,</span> luabind<span class="hl opt">::</span>module_<span class="hl opt">&amp;</span> module <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_31"></a><span class="hl lin">031 </span>    <span class="hl opt">{</span>
+<a name="luabind_sequencer.h_32"></a><span class="hl lin">032 </span>        <span class="hl kwd">LUA_DECLARE_CLASS_SCOPED</span><span class="hl opt">(</span> Message <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_33"></a><span class="hl lin">033 </span>            <span class="hl kwd">LUA_DECLARE_CTOR</span><span class="hl opt">(</span> Message <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_34"></a><span class="hl lin">034 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Message<span class="hl opt">,</span> asString <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_35"></a><span class="hl lin">035 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> Message <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_36"></a><span class="hl lin">036 </span>
+<a name="luabind_sequencer.h_37"></a><span class="hl lin">037 </span>        <span class="hl kwd">LUA_DECLARE_DERIVED_CLASS_SCOPED</span><span class="hl opt">(</span> StringMessage<span class="hl opt">,</span> Message <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_38"></a><span class="hl lin">038 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_1</span><span class="hl opt">(</span> StringMessage<span class="hl opt">,</span> <span class="hl kwb">const char</span><span class="hl opt">* );</span>
+<a name="luabind_sequencer.h_39"></a><span class="hl lin">039 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> StringMessage <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_40"></a><span class="hl lin">040 </span>    <span class="hl opt">}</span>
+<a name="luabind_sequencer.h_41"></a><span class="hl lin">041 </span>
+<a name="luabind_sequencer.h_42"></a><span class="hl lin">042 </span>    <span class="hl kwb">void</span> <span class="hl kwd">CreateMessageQueueExports</span><span class="hl opt">(</span> lua_State<span class="hl opt">*</span> lua<span class="hl opt">,</span> luabind<span class="hl opt">::</span>module_<span class="hl opt">&amp;</span> module <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_43"></a><span class="hl lin">043 </span>    <span class="hl opt">{</span>
+<a name="luabind_sequencer.h_44"></a><span class="hl lin">044 </span>        <span class="hl kwd">LUA_DECLARE_CLASS_SCOPED</span><span class="hl opt">(</span> MessageQueue <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_45"></a><span class="hl lin">045 </span>            <span class="hl kwd">LUA_DECLARE_CTOR</span><span class="hl opt">(</span> MessageQueue <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_46"></a><span class="hl lin">046 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> Send <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_47"></a><span class="hl lin">047 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> IsEmpty <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_48"></a><span class="hl lin">048 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> CancelWait <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_49"></a><span class="hl lin">049 </span>            <span class="hl slc">// explicit macro required of overloaded methods - or non void methods</span>
+<a name="luabind_sequencer.h_50"></a><span class="hl lin">050 </span>            <span class="hl kwd">LUA_DECLARE_METHOD_PROTO</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> Poll<span class="hl opt">, (</span>boost<span class="hl opt">::</span>shared_ptr<span class="hl opt">&lt;</span>Message<span class="hl opt">&gt;(</span>MessageQueue<span class="hl opt">::*)(</span>std<span class="hl opt">::</span>vector<span class="hl opt">&lt;</span> typename  boost<span class="hl opt">::</span>shared_ptr<span class="hl opt">&lt;</span>Message<span class="hl opt">&gt; &gt;,</span> <span class="hl kwb">bool</span><span class="hl opt">))&amp;</span>MessageQueue<span class="hl opt">::</span>Poll <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_51"></a><span class="hl lin">051 </span>            <span class="hl kwd">LUA_DECLARE_METHOD_PROTO</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> Poll<span class="hl opt">, (</span>boost<span class="hl opt">::</span>shared_ptr<span class="hl opt">&lt;</span>Message<span class="hl opt">&gt;(</span>MessageQueue<span class="hl opt">::*)())&amp;</span>MessageQueue<span class="hl opt">::</span>Poll <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_52"></a><span class="hl lin">052 </span>            <span class="hl kwd">LUA_DECLARE_METHOD_PROTO</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> Wait<span class="hl opt">, (</span>boost<span class="hl opt">::</span>shared_ptr<span class="hl opt">&lt;</span>Message<span class="hl opt">&gt;(</span>MessageQueue<span class="hl opt">::*)(</span>std<span class="hl opt">::</span>vector<span class="hl opt">&lt;</span> typename  boost<span class="hl opt">::</span>shared_ptr<span class="hl opt">&lt;</span>Message<span class="hl opt">&gt; &gt;,</span> <span class="hl kwb">bool</span><span class="hl opt">))&amp;</span>MessageQueue<span class="hl opt">::</span>Wait <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_53"></a><span class="hl lin">053 </span>            <span class="hl kwd">LUA_DECLARE_METHOD_PROTO</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> Wait<span class="hl opt">, (</span>boost<span class="hl opt">::</span>shared_ptr<span class="hl opt">&lt;</span>Message<span class="hl opt">&gt;(</span>MessageQueue<span class="hl opt">::*)())&amp;</span>MessageQueue<span class="hl opt">::</span>Wait <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_54"></a><span class="hl lin">054 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> CancelWait <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_55"></a><span class="hl lin">055 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> MessageQueue<span class="hl opt">,</span> CancelWait <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_56"></a><span class="hl lin">056 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> MessageQueue <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_57"></a><span class="hl lin">057 </span>    <span class="hl opt">}</span>
+<a name="luabind_sequencer.h_58"></a><span class="hl lin">058 </span>
+<a name="luabind_sequencer.h_59"></a><span class="hl lin">059 </span>    <span class="hl kwb">void</span> <span class="hl kwd">CreateEventListenerExports</span><span class="hl opt">(</span> lua_State<span class="hl opt">*</span> lua<span class="hl opt">,</span> luabind<span class="hl opt">::</span>module_<span class="hl opt">&amp;</span> module <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_60"></a><span class="hl lin">060 </span>    <span class="hl opt">{</span>
+<a name="luabind_sequencer.h_61"></a><span class="hl lin">061 </span>        <span class="hl kwd">LUA_DECLARE_CLASS_SCOPED</span><span class="hl opt">(</span> Listener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_62"></a><span class="hl lin">062 </span>            <span class="hl kwd">LUA_DECLARE_CTOR</span><span class="hl opt">(</span> Listener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_63"></a><span class="hl lin">063 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> Listener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_64"></a><span class="hl lin">064 </span>
+<a name="luabind_sequencer.h_65"></a><span class="hl lin">065 </span>        <span class="hl kwd">LUA_DECLARE_DERIVED_CLASS_SCOPED</span><span class="hl opt">(</span> EventListener<span class="hl opt">,</span> Listener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_66"></a><span class="hl lin">066 </span>            <span class="hl kwd">LUA_DECLARE_CTOR</span><span class="hl opt">(</span> EventListener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_67"></a><span class="hl lin">067 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_1</span><span class="hl opt">(</span> EventListener<span class="hl opt">,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp; );</span>
+<a name="luabind_sequencer.h_68"></a><span class="hl lin">068 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> EventListener<span class="hl opt">,</span> WaitEvent <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_69"></a><span class="hl lin">069 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> EventListener<span class="hl opt">,</span> SetEventToListen <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_70"></a><span class="hl lin">070 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> EventListener<span class="hl opt">,</span> GetEventToListen <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_71"></a><span class="hl lin">071 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> EventListener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_72"></a><span class="hl lin">072 </span>    <span class="hl opt">}</span>
+<a name="luabind_sequencer.h_73"></a><span class="hl lin">073 </span>
+<a name="luabind_sequencer.h_74"></a><span class="hl lin">074 </span>    <span class="hl kwb">void</span> <span class="hl kwd">CreateSequencerExports</span><span class="hl opt">(</span> lua_State<span class="hl opt">*</span> lua<span class="hl opt">,</span> luabind<span class="hl opt">::</span>module_<span class="hl opt">&amp;</span> module <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_75"></a><span class="hl lin">075 </span>    <span class="hl opt">{</span>
+<a name="luabind_sequencer.h_76"></a><span class="hl lin">076 </span>        <span class="hl kwd">LUA_DECLARE_CLASS_SCOPED</span><span class="hl opt">(</span> Sequencer <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_77"></a><span class="hl lin">077 </span>            <span class="hl slc">// link class enums (used in StateMessage)</span>
+<a name="luabind_sequencer.h_78"></a><span class="hl lin">078 </span>            <span class="hl kwd">LUA_BEGIN_ENUM</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> SeqStates <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_79"></a><span class="hl lin">079 </span>                <span class="hl kwd">LUA_ENUM_VALUE</span><span class="hl opt">(</span> IDLE<span class="hl opt">,</span>       Sequencer<span class="hl opt">::</span>IDLE     <span class="hl opt">) ,</span>
+<a name="luabind_sequencer.h_80"></a><span class="hl lin">080 </span>                <span class="hl kwd">LUA_ENUM_VALUE</span><span class="hl opt">(</span> START<span class="hl opt">,</span>      Sequencer<span class="hl opt">::</span>START    <span class="hl opt">),</span>
+<a name="luabind_sequencer.h_81"></a><span class="hl lin">081 </span>                <span class="hl kwd">LUA_ENUM_VALUE</span><span class="hl opt">(</span> RUNNING<span class="hl opt">,</span>    Sequencer<span class="hl opt">::</span>RUNNING  <span class="hl opt">),</span>
+<a name="luabind_sequencer.h_82"></a><span class="hl lin">082 </span>                <span class="hl kwd">LUA_ENUM_VALUE</span><span class="hl opt">(</span> TERMINATE<span class="hl opt">,</span>  Sequencer<span class="hl opt">::</span>TERMINATE<span class="hl opt">),</span>
+<a name="luabind_sequencer.h_83"></a><span class="hl lin">083 </span>                <span class="hl kwd">LUA_ENUM_VALUE</span><span class="hl opt">(</span> STOPPED<span class="hl opt">,</span>    Sequencer<span class="hl opt">::</span>STOPPED  <span class="hl opt">),</span>
+<a name="luabind_sequencer.h_84"></a><span class="hl lin">084 </span>                <span class="hl kwd">LUA_ENUM_VALUE</span><span class="hl opt">(</span> SUSPEND<span class="hl opt">,</span>    Sequencer<span class="hl opt">::</span>SUSPEND  <span class="hl opt">),</span>
+<a name="luabind_sequencer.h_85"></a><span class="hl lin">085 </span>                <span class="hl kwd">LUA_ENUM_VALUE</span><span class="hl opt">(</span> RESUME<span class="hl opt">,</span>     Sequencer<span class="hl opt">::</span>RESUME   <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_86"></a><span class="hl lin">086 </span>            <span class="hl kwd">LUA_END_ENUM</span><span class="hl opt">();</span>
+<a name="luabind_sequencer.h_87"></a><span class="hl lin">087 </span>
+<a name="luabind_sequencer.h_88"></a><span class="hl lin">088 </span>            <span class="hl slc">// declare an inner scope and put the inner class into it, -&gt; class Sequencer::StateMessage : public Message {}</span>
+<a name="luabind_sequencer.h_89"></a><span class="hl lin">089 </span>            <span class="hl kwd">LUA_DECLARE_INNER_DERIVED_CLASS_SCOPED</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> StateMessage<span class="hl opt">,</span> Message <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_90"></a><span class="hl lin">090 </span>                <span class="hl kwd">LUA_DECLARE_CTOR_1</span><span class="hl opt">(</span> StateMessage<span class="hl opt">,</span> Sequencer<span class="hl opt">::</span>SeqStates <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_91"></a><span class="hl lin">091 </span>            <span class="hl kwd">LUA_END_DECLARE</span><span class="hl opt">();</span>
+<a name="luabind_sequencer.h_92"></a><span class="hl lin">092 </span>            <span class="hl slc">// now we can attach this &quot;inner class&quot; to the current scope (Sequencer)</span>
+<a name="luabind_sequencer.h_93"></a><span class="hl lin">093 </span>            <span class="hl kwd">LUA_BEGIN_SCOPE</span><span class="hl opt">(</span> Sequencer <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_94"></a><span class="hl lin">094 </span>                <span class="hl kwd">LUA_CLASS</span><span class="hl opt">(</span>StateMessage<span class="hl opt">)</span>
+<a name="luabind_sequencer.h_95"></a><span class="hl lin">095 </span>            <span class="hl kwd">LUA_END_SCOPE</span><span class="hl opt">();</span>
+<a name="luabind_sequencer.h_96"></a><span class="hl lin">096 </span>
+<a name="luabind_sequencer.h_97"></a><span class="hl lin">097 </span>            <span class="hl slc">// now methods, etc.</span>
+<a name="luabind_sequencer.h_98"></a><span class="hl lin">098 </span>            <span class="hl kwd">LUA_DECLARE_CTOR</span><span class="hl opt">(</span> Sequencer <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_99"></a><span class="hl lin">099 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_1</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> <span class="hl kwb">const</span> MessageQueuePtr<span class="hl opt">&amp; );</span>
+<a name="luabind_sequencer.h_100"></a><span class="hl lin">100 </span>
+<a name="luabind_sequencer.h_101"></a><span class="hl lin">101 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> RegisterListener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_102"></a><span class="hl lin">102 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> UnregisterListener <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_103"></a><span class="hl lin">103 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> SetMessageQueue <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_104"></a><span class="hl lin">104 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> GetMessageQueue <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_105"></a><span class="hl lin">105 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> Add <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_106"></a><span class="hl lin">106 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> Clear <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_107"></a><span class="hl lin">107 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> Start <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_108"></a><span class="hl lin">108 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> Sequencer<span class="hl opt">,</span> Stop <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_109"></a><span class="hl lin">109 </span>
+<a name="luabind_sequencer.h_110"></a><span class="hl lin">110 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> Sequencer <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_111"></a><span class="hl lin">111 </span>    <span class="hl opt">}</span>
+<a name="luabind_sequencer.h_112"></a><span class="hl lin">112 </span>
+<a name="luabind_sequencer.h_113"></a><span class="hl lin">113 </span>    <span class="hl kwb">void</span> <span class="hl kwd">CreateEffectExports</span><span class="hl opt">(</span> lua_State<span class="hl opt">*</span> lua<span class="hl opt">,</span> luabind<span class="hl opt">::</span>module_<span class="hl opt">&amp;</span> module <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_114"></a><span class="hl lin">114 </span>    <span class="hl opt">{</span>
+<a name="luabind_sequencer.h_115"></a><span class="hl lin">115 </span>        <span class="hl kwd">LUA_DECLARE_CLASS_SCOPED</span><span class="hl opt">(</span> SeqEffect <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_116"></a><span class="hl lin">116 </span>            <span class="hl kwd">LUA_DECLARE_CTOR</span><span class="hl opt">(</span> SeqEffect <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_117"></a><span class="hl lin">117 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_1</span><span class="hl opt">(</span> SeqEffect<span class="hl opt">,</span> <span class="hl kwb">const</span> MessageQueuePtr<span class="hl opt">&amp; );</span>
+<a name="luabind_sequencer.h_118"></a><span class="hl lin">118 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> SeqEffect<span class="hl opt">,</span> Init <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_119"></a><span class="hl lin">119 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> SeqEffect<span class="hl opt">,</span> SetMessageQueue <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_120"></a><span class="hl lin">120 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> SeqEffect<span class="hl opt">,</span> GetMessageQueue <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_121"></a><span class="hl lin">121 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> SeqEffect<span class="hl opt">,</span> Start <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_122"></a><span class="hl lin">122 </span>            <span class="hl kwd">LUA_DECLARE_METHOD</span><span class="hl opt">(</span> SeqEffect<span class="hl opt">,</span> Stop <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_123"></a><span class="hl lin">123 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> SeqEffect <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_124"></a><span class="hl lin">124 </span>
+<a name="luabind_sequencer.h_125"></a><span class="hl lin">125 </span>        <span class="hl kwd">LUA_DECLARE_DERIVED_CLASS_SCOPED</span><span class="hl opt">(</span> SeqTimedEffect<span class="hl opt">,</span> SeqEffect <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_126"></a><span class="hl lin">126 </span>            <span class="hl slc">// default parameters require explicit entry</span>
+<a name="luabind_sequencer.h_127"></a><span class="hl lin">127 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_2</span><span class="hl opt">(</span> SeqTimedEffect<span class="hl opt">,</span> <span class="hl kwb">double</span><span class="hl opt">,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp; );</span>
+<a name="luabind_sequencer.h_128"></a><span class="hl lin">128 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_3</span><span class="hl opt">(</span> SeqTimedEffect<span class="hl opt">,</span> <span class="hl kwb">double</span><span class="hl opt">,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp;,</span> <span class="hl kwb">int</span> <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_129"></a><span class="hl lin">129 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_4</span><span class="hl opt">(</span> SeqTimedEffect<span class="hl opt">,</span> <span class="hl kwb">double</span><span class="hl opt">,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp;,</span> <span class="hl kwb">int</span><span class="hl opt">,</span> <span class="hl kwb">const</span> MessageQueuePtr<span class="hl opt">&amp; );</span>
+<a name="luabind_sequencer.h_130"></a><span class="hl lin">130 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> SeqTimedEffect <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_131"></a><span class="hl lin">131 </span>
+<a name="luabind_sequencer.h_132"></a><span class="hl lin">132 </span>        <span class="hl kwd">LUA_DECLARE_DERIVED_CLASS_SCOPED</span><span class="hl opt">(</span> SeqEventEffect<span class="hl opt">,</span> SeqEffect <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_133"></a><span class="hl lin">133 </span>            <span class="hl slc">// default parameters require explicit entry</span>
+<a name="luabind_sequencer.h_134"></a><span class="hl lin">134 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_2</span><span class="hl opt">(</span> SeqEventEffect<span class="hl opt">,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp;,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp; );</span>
+<a name="luabind_sequencer.h_135"></a><span class="hl lin">135 </span>            <span class="hl kwd">LUA_DECLARE_CTOR_3</span><span class="hl opt">(</span> SeqEventEffect<span class="hl opt">,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp;,</span> <span class="hl kwb">const</span> MessagePtr<span class="hl opt">&amp;,</span> <span class="hl kwb">const</span> MessageQueuePtr<span class="hl opt">&amp; );</span>
+<a name="luabind_sequencer.h_136"></a><span class="hl lin">136 </span>        <span class="hl kwd">LUA_DEFINE_CLASS</span><span class="hl opt">(</span> module<span class="hl opt">,</span> SeqEventEffect <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_137"></a><span class="hl lin">137 </span>    <span class="hl opt">}</span>
+<a name="luabind_sequencer.h_138"></a><span class="hl lin">138 </span>
+<a name="luabind_sequencer.h_139"></a><span class="hl lin">139 </span>    <span class="hl kwb">void</span> <span class="hl kwd">Register</span><span class="hl opt">(</span> lua_State<span class="hl opt">*</span> lua <span class="hl opt">)</span>
+<a name="luabind_sequencer.h_140"></a><span class="hl lin">140 </span>    <span class="hl opt">{</span>
+<a name="luabind_sequencer.h_141"></a><span class="hl lin">141 </span>        luabind<span class="hl opt">::</span><span class="hl kwd">open</span><span class="hl opt">(</span>lua<span class="hl opt">);</span>
+<a name="luabind_sequencer.h_142"></a><span class="hl lin">142 </span>
+<a name="luabind_sequencer.h_143"></a><span class="hl lin">143 </span>        <span class="hl slc">// state, namespace</span>
+<a name="luabind_sequencer.h_144"></a><span class="hl lin">144 </span>        luabind<span class="hl opt">::</span>module_ module <span class="hl opt">=</span> <span class="hl kwd">LUA_CREATE_MODULE_NS</span><span class="hl opt">(</span> lua<span class="hl opt">,</span> pei <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_145"></a><span class="hl lin">145 </span>
+<a name="luabind_sequencer.h_146"></a><span class="hl lin">146 </span>        <span class="hl slc">// now, this binds a listener to the sequencer and makes lua wait till the sequence ends</span>
+<a name="luabind_sequencer.h_147"></a><span class="hl lin">147 </span>        <span class="hl kwd">CreateEventListenerExports</span><span class="hl opt">(</span> lua<span class="hl opt">,</span> module <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_148"></a><span class="hl lin">148 </span>        <span class="hl slc">// All Message Queue related exports</span>
+<a name="luabind_sequencer.h_149"></a><span class="hl lin">149 </span>        <span class="hl kwd">CreateMessageExports</span><span class="hl opt">(</span> lua<span class="hl opt">,</span> module <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_150"></a><span class="hl lin">150 </span>        <span class="hl slc">// All built in effects</span>
+<a name="luabind_sequencer.h_151"></a><span class="hl lin">151 </span>        <span class="hl kwd">CreateEffectExports</span><span class="hl opt">(</span> lua<span class="hl opt">,</span> module <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_152"></a><span class="hl lin">152 </span>        <span class="hl slc">// The Sequencer itself</span>
+<a name="luabind_sequencer.h_153"></a><span class="hl lin">153 </span>        <span class="hl kwd">CreateSequencerExports</span><span class="hl opt">(</span> lua<span class="hl opt">,</span> module <span class="hl opt">);</span>
+<a name="luabind_sequencer.h_154"></a><span class="hl lin">154 </span>    <span class="hl opt">}</span>
+<a name="luabind_sequencer.h_155"></a><span class="hl lin">155 </span>
+<a name="luabind_sequencer.h_156"></a><span class="hl lin">156 </span><span class="hl opt">}</span>
+<a name="luabind_sequencer.h_157"></a><span class="hl lin">157 </span>
+<a name="luabind_sequencer.h_158"></a><span class="hl lin">158 </span><span class="hl ppc">#endif</span>
+<a name="luabind_sequencer.h_159"></a><span class="hl lin">159 </span>
+<a name="luabind_sequencer.h_160"></a><span class="hl lin">160 </span><span class="hl ppc">#endif</span> <span class="hl com">/* __LUABIND_SEQUENCER_H__ */</span><span class="hl ppc"></span>
+</pre>
+</body>
+</html>
+<!--HTML generated by highlight 3.9, http://www.andre-simon.de/-->
